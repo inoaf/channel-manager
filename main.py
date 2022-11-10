@@ -8,6 +8,7 @@ import downloader
 from petpetgif import petpet
 
 msg = None
+link_preview = False 
 
 genres_template = {
     'Action':'👊 Action',
@@ -322,6 +323,12 @@ async def copy_message(event):
     except Exception as e:
         await event.edit(str(e))
 
+@client.on(events.NewMessage(outgoing=True, pattern=("\+linkp")))
+async def _(event):
+    global link_preview
+    link_preview = False if link_preview == True else True
+    event.edit(f"Link preview set to: {link_preview}")
+
 @client.on(events.NewMessage(outgoing=True, pattern=("\+show")))
 async def preveiw(event):
     try:
@@ -353,10 +360,13 @@ async def post(event):
             ads = []
             for i in ids:
                 ent = await bot.get_entity(i)
-                a = await bot.send_message(ent,message=msg.text,buttons=msg.buttons,file=media)
+                a = await bot.send_message(ent,message=msg.text,buttons=msg.buttons,file=media,link_preview=link_preview)
                 ads.append(i + "/" + str(a.id))
             await event.edit("\n".join(ads))
-            os.remove(media)
+            try:
+                os.remove(media)
+            except:
+                pass
         else:
             await event.edit("No message copied")
     except Exception as e:
