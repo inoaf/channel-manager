@@ -1,12 +1,13 @@
 import time
 from telethon import events
 from config import client as client
+from config import bot
 from FastTelethon import upload_file
 import os
 import downloader
-import asyncio
 from petpetgif import petpet
-from telethon.tl.functions.channels import JoinChannelRequest
+
+msg = None
 
 genres_template = {
     'Action':'👊 Action',
@@ -310,50 +311,97 @@ async def fwd_function(event):
     time.sleep(1)
     await x.delete()
     await event.delete()
-    
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+copy")))
+async def copy_message(event):
+    try:
+        global msg
+        await event.edit("okay, on it")
+        msg = await event.get_reply_message()
+        await event.edit("Done.")
+    except Exception as e:
+        await event.edit(str(e))
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+show")))
+async def preveiw(event):
+    try:
+        global msg
+        await event.edit("okay, on it")
+        if msg is not None:
+            media = await client.download_media(msg.media)
+            await bot.send_message(event.chat_id,message=msg.text,buttons=msg.buttons,file=media)
+            await event.delete()
+            os.remove(media)
+        else:
+            await event.edit("No message copied")
+    except Exception as e:
+        await event.edit(str(e))
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+post")))
+async def post(event):
+    try:
+        global msg
+        await event.edit("okay, on it")
+        if msg is not None:
+            reply = await event.get_reply_message()
+            if reply is None:
+                await event.edit("reply to a message")
+                return
+            ids = reply.text.replace("@","t.me/")
+            ids = ids.split("\n")
+            media = await client.download_media(msg.media)
+            ads = []
+            for i in ids:
+                ent = await bot.get_entity(i)
+                a = await bot.send_message(ent,message=msg.text,buttons=msg.buttons,file=media)
+                ads.append(i + "/" + str(a.id))
+            await event.edit("\n".join(ads))
+            os.remove(media)
+        else:
+            await event.edit("No message copied")
+    except Exception as e:
+        await event.edit(str(e))
+
+
 @client.on(events.NewMessage(outgoing=True, pattern=("\+del")))
-async def _(event):
-    chs = await event.get_reply_message()
-    chs = chs.text
-    chs = chs.split("\n")
-    for i in chs:
-        i = i.strip()
-        data = i.split("/")
-        username = data[-2]
-        msgid = data[-1]
-        await client.delete_messages("t.me/"+username, msgid)
-        await asyncio.sleep(2)
+async def delete(event):
+    try:
+        await event.edit("okay, on it")
+        x = await event.get_reply_message()
+        if x is None:
+            event.edit("reply to message")
+            return
+        id_list = []
+        txt = x.text.split('\n')
+        for i in txt:
+            a = i.split("/")
+            username = a[-2]
+            msgid = a[-1]
+            print(username)
+            await bot.delete_messages("t.me/"+username, msgid)
 
+        await event.edit("Done.")
+    except Exception as e:
+        await event.edit(str(e))
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+promote")))
-async def _(event):
-    chs = await event.get_reply_message()
-    chs = chs.text
-    chs = chs.split("\n")
-    for i in chs:
-        i = i.strip()
-        await client(JoinChannelRequest(i.replace("@", "t.me/")))
-        await event.reply(f"/spromote {i}")
-        await asyncio.sleep(1)
+@client.on(events.NewMessage(outgoing=True, pattern=("\+parse")))
+async def parse(event):
+    try:
+        await event.edit("okay, on it")
+        x = await event.get_reply_message()
+        if x is None:
+            event.edit("reply to message")
+            return
+        msg = []
+        x = x.text.split("\n")
+        for i in x:
+            a = i.split()
+            msg.append(a[0])
 
+        await event.edit("\n".join(msg))
+    except Exception as e:
+        await event.edit(str(e))
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+add")))
-async def _(event):
-    msg_id = int(event.text.split()[-1])
-    ad_msg = await client.get_messages(event.chat_id, ids=msg_id)
-
-    chs = await event.get_reply_message()
-    chs = chs.text
-    chs = chs.split("\n")
-    ads = ""
-    for i in chs:
-        i = i.strip()
-        a = await client.send_message(i.replace("@", "t.me/"), ad_msg)
-        ads = ads + i.replace("@", "t.me/") + "/" + str(a.id) + "\n"
-        await event.edit(f"posting in {i}") 
-        await asyncio.sleep(4)
-
-    await event.reply(ads)
 
 client.start()
 
