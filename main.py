@@ -336,7 +336,7 @@ async def preveiw(event):
         await event.edit("okay, on it")
         if msg is not None:
             media = await client.download_media(msg.media)
-            await bot.send_message(event.chat_id,message=msg.text,buttons=msg.buttons,file=media)
+            await bot.send_message(event.chat_id,message=msg.text,buttons=msg.buttons,file=media,link_preview=link_preview)
             await event.delete()
             os.remove(media)
         else:
