@@ -327,7 +327,7 @@ async def copy_message(event):
 async def _(event):
     global link_preview
     link_preview = False if link_preview == True else True
-    event.edit(f"Link preview set to: {link_preview}")
+    await event.edit(f"Link preview set to: {link_preview}")
 
 @client.on(events.NewMessage(outgoing=True, pattern=("\+show")))
 async def preveiw(event):
