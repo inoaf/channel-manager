@@ -1,5 +1,6 @@
-https://github.com/New-dev0/Telethon/archive/master.zip
+telethon
 requests
 cryptg
 telethon-tgcrypto
 pet-pet-gif
+python-dotenv
