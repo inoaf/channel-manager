@@ -1,10 +1,14 @@
 import time
 from telethon import events
 from config import client as client
+from config import bot
 from FastTelethon import upload_file
 import os
 import downloader
 from petpetgif import petpet
+
+msg = None
+link_preview = False 
 
 genres_template = {
     'Action':'👊 Action',
@@ -308,6 +312,106 @@ async def fwd_function(event):
     time.sleep(1)
     await x.delete()
     await event.delete()
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+copy")))
+async def copy_message(event):
+    try:
+        global msg
+        await event.edit("okay, on it")
+        msg = await event.get_reply_message()
+        await event.edit("Done.")
+    except Exception as e:
+        await event.edit(str(e))
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+linkp")))
+async def _(event):
+    global link_preview
+    link_preview = False if link_preview == True else True
+    await event.edit(f"Link preview set to: {link_preview}")
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+show")))
+async def preveiw(event):
+    try:
+        global msg
+        await event.edit("okay, on it")
+        if msg is not None:
+            media = await client.download_media(msg.media)
+            await bot.send_message(event.chat_id,message=msg.text,buttons=msg.buttons,file=media,link_preview=link_preview)
+            await event.delete()
+            os.remove(media)
+        else:
+            await event.edit("No message copied")
+    except Exception as e:
+        await event.edit(str(e))
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+post")))
+async def post(event):
+    try:
+        global msg
+        await event.edit("okay, on it")
+        if msg is not None:
+            reply = await event.get_reply_message()
+            if reply is None:
+                await event.edit("reply to a message")
+                return
+            ids = reply.text.replace("@","t.me/")
+            ids = ids.split("\n")
+            media = await client.download_media(msg.media)
+            ads = []
+            for i in ids:
+                ent = await bot.get_entity(i)
+                a = await bot.send_message(ent,message=msg.text,buttons=msg.buttons,file=media,link_preview=link_preview)
+                ads.append(i + "/" + str(a.id))
+            await event.edit("\n".join(ads))
+            try:
+                os.remove(media)
+            except:
+                pass
+        else:
+            await event.edit("No message copied")
+    except Exception as e:
+        await event.edit(str(e))
+
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+del")))
+async def delete(event):
+    try:
+        await event.edit("okay, on it")
+        x = await event.get_reply_message()
+        if x is None:
+            event.edit("reply to message")
+            return
+        id_list = []
+        txt = x.text.split('\n')
+        for i in txt:
+            a = i.split("/")
+            username = a[-2]
+            msgid = a[-1]
+            print(username)
+            await bot.delete_messages("t.me/"+username, msgid)
+
+        await event.edit("Done.")
+    except Exception as e:
+        await event.edit(str(e))
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+parse")))
+async def parse(event):
+    try:
+        await event.edit("okay, on it")
+        x = await event.get_reply_message()
+        if x is None:
+            event.edit("reply to message")
+            return
+        msg = []
+        x = x.text.split("\n")
+        for i in x:
+            a = i.split()
+            msg.append(a[0])
+
+        await event.edit("\n".join(msg))
+    except Exception as e:
+        await event.edit(str(e))
+
 
 client.start()
 
