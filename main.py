@@ -1,5 +1,5 @@
 import time
-from telethon import events
+from telethon import events, Button
 from config import client, bot, main_bot_id
 import os
 from telethon.tl.functions.channels import JoinChannelRequest
@@ -181,7 +181,6 @@ async def delete(event):
         if x is None:
             event.edit("reply to message")
             return
-        id_list = []
         txt = x.text.split('\n')
         for i in txt:
             a = i.split("/")
@@ -223,6 +222,17 @@ async def _(event):
     await bot.edit_admin(chat, user, change_info=perms.change_info, post_messages= perms.post_messages, edit_messages=perms.edit_messages, delete_messages=perms.delete_messages, invite_users=perms.invite_users, add_admins=perms.add_admins, manage_call=perms.manage_call)
     await event.edit(f"Promoted in {data[1]}")
 
+@client.on(events.NewMessage(outgoing=True, pattern=("\+mkpost")))
+async def _(event):
+    msg = await event.get_reply_message()
+    data = event.raw_text.split("\n")[1:]
+    l1, l2, l3 = data
+    await bot.send_message(
+        event.chat_id,
+        msg.raw_text,
+        buttons=[Button.url("360p", l1), Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
+    )
+    
 
 client.start()
 
