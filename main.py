@@ -230,7 +230,7 @@ async def _(event):
     await bot.send_message(
         event.chat_id,
         msg.raw_text,
-        buttons=[Button.url("360p", l1), Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
+        buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
     )
     
 
