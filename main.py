@@ -225,12 +225,16 @@ async def _(event):
 @client.on(events.NewMessage(outgoing=True, pattern=("\+mkpost")))
 async def _(event):
     msg = await event.get_reply_message()
+    try:
+        media = await client.download_media(msg.media)
+    except:
+        media = None
     data = event.raw_text.split("\n")[1:]
     l1, l2, l3 = data
     await bot.send_message(
         event.chat_id,
         msg.raw_text,
-        file=msg.file,
+        file=media,
         buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
     )
     
