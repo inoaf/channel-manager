@@ -265,9 +265,9 @@ async def _(event):
         m3 = await client.send_message(-1001985589023, l3)
 
         name = fch["name"]
-        l1080 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m1.id}"
-        l720 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m2.id}"
-        l360 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m3.id}"
+        l1080 = f"t.me/FileService_AnimeBot?start=single_{-1001985589023}_{m1.id}client{event.sender_id}"
+        l720 = f"t.me/FileService_AnimeBot?start=single_{-1001985589023}_{m2.id}client{event.sender_id}"
+        l360 = f"t.me/FileService_AnimeBot?start=single_{-1001985589023}_{m3.id}client{event.sender_id}"
         
         if a<10:
             temp = name.replace("OwO", f"00{a}")
