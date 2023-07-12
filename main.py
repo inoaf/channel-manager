@@ -254,14 +254,15 @@ async def _(event):
         fch[d1[0]] = d1[1]
 
     a = int(fch["startep"])
+    txt = ""
     for i in range(int(fch["start"]),int(fch["end"])+1, 3):
         l1 = await client.get_messages(event.chat_id, ids=i)
         l2 = await client.get_messages(event.chat_id, ids=i+1)
         l3 = await client.get_messages(event.chat_id, ids=i+2)
         
-        m1 = await client.send_message("t.me/FileService_AnimeBot", l1)
-        m2 = await client.send_message("t.me/FileService_AnimeBot", l2)
-        m3 = await client.send_message("t.me/FileService_AnimeBot", l3)
+        m1 = await client.send_message(-1001985589023, l1)
+        m2 = await client.send_message(-1001985589023, l2)
+        m3 = await client.send_message(-1001985589023, l3)
 
         name = fch["name"]
         l1080 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m1.id}"
@@ -286,7 +287,9 @@ async def _(event):
             buttons=[Button.url("360p", l360), Button.url("720p", l720), Button.url("1080p", l1080)]
         )
         a += 1
-        await event.reply(f"t.me/{fch['target']}/{final.id}")
+        txt += f"t.me/{fch['target'].replace('-100', '')}/{final.id}"
+        txt += "\n"
+    await event.reply(txt)
 
 client.start()
 
