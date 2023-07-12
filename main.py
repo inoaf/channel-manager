@@ -238,6 +238,54 @@ async def _(event):
         buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
     )
     
+@client.on(events.NewMEssage(outgoing=True, pattern=("\+bulkmkpost")))
+async def _(event):
+    msg = await event.get_reply_message()
+    try:
+        media = await client.download_media(msg.media)
+    except:
+        media = None
+
+    data = msg.raw_text.split("\n\n")
+    fch = dict()
+
+    for i in data:
+        d1 = i.split("|")
+        fch[d1[0]] = d1[1]
+
+    a = int(fch["startep"])
+    for i in range(int(fch["start"]),int(fch["end"])+1, 3):
+        l1 = await client.get_messages(event.chat_id, ids=i)
+        l2 = await client.get_messages(event.chat_id, ids=i+1)
+        l3 = await client.get_messages(event.chat_id, ids=i+2)
+        
+        m1 = await client.send_message(6352854488, l1)
+        m2 = await client.send_message(6352854488, l2)
+        m3 = await client.send_message(6352854488, l3)
+
+        name = fch["name"]
+        l1080 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m1.id}"
+        l720 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m2.id}"
+        l360 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m3.id}"
+        
+        if a<10:
+            temp = name.replace("OwO", f"00{a}")
+            temp = temp.replace("UwU", f"0{a}")
+
+        elif a<100:
+            temp = name.replace("OwO", f"0{a}")
+            temp = temp.replace("UwU", f"{a}")
+
+        else:
+            temp = name.replace("OwO", f"{a}")
+
+        await bot.send_message(
+            int(fch["target"]),
+            name,
+            file=media,
+            buttons=[Button.url("360p", l360), Button.url("720p", l720), Button.url("1080p", l1080)]
+        )
+        a += 1
 
 client.start()
 
