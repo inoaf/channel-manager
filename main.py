@@ -281,12 +281,12 @@ async def _(event):
 
         final = await bot.send_message(
             int(fch["target"]),
-            name,
+            temp,
             file=media,
             buttons=[Button.url("360p", l360), Button.url("720p", l720), Button.url("1080p", l1080)]
         )
         a += 1
-        event.reply(f"t.me/{fch['target']}/{final.id}")
+        await event.reply(f"t.me/{fch['target']}/{final.id}")
 
 client.start()
 
