@@ -238,7 +238,7 @@ async def _(event):
         buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
     )
     
-@client.on(events.NewMEssage(outgoing=True, pattern=("\+bulkmkpost")))
+@client.on(events.NewMessage(outgoing=True, pattern=("\+bulkmkpost")))
 async def _(event):
     msg = await event.get_reply_message()
     try:
@@ -279,13 +279,14 @@ async def _(event):
         else:
             temp = name.replace("OwO", f"{a}")
 
-        await bot.send_message(
+        final = await bot.send_message(
             int(fch["target"]),
             name,
             file=media,
             buttons=[Button.url("360p", l360), Button.url("720p", l720), Button.url("1080p", l1080)]
         )
         a += 1
+        event.reply(f"t.me/{fch['target']}/{final.id}")
 
 client.start()
 
