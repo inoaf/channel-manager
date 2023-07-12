@@ -259,9 +259,9 @@ async def _(event):
         l2 = await client.get_messages(event.chat_id, ids=i+1)
         l3 = await client.get_messages(event.chat_id, ids=i+2)
         
-        m1 = await client.send_message(6352854488, l1)
-        m2 = await client.send_message(6352854488, l2)
-        m3 = await client.send_message(6352854488, l3)
+        m1 = await client.send_message("t.me/FileService_AnimeBot", l1)
+        m2 = await client.send_message("t.me/FileService_AnimeBot", l2)
+        m3 = await client.send_message("t.me/FileService_AnimeBot", l3)
 
         name = fch["name"]
         l1080 = f"t.me/FileService_AnimeBot?start=single_{event.sender_id}_{m1.id}"
