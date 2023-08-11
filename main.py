@@ -222,6 +222,23 @@ async def _(event):
     await bot.edit_admin(chat, user, change_info=perms.change_info, post_messages= perms.post_messages, edit_messages=perms.edit_messages, delete_messages=perms.delete_messages, invite_users=perms.invite_users, add_admins=perms.add_admins, manage_call=perms.manage_call)
     await event.edit(f"Promoted in {data[1]}")
 
+@client.on(events.NewMessage(outgoing=True, pattern=("\+oldmkpost")))
+async def _(event):
+    msg = await event.get_reply_message()
+    try:
+        media = await client.download_media(msg.media)
+    except:
+        media = None
+    data = event.raw_text.split("\n")[1:]
+    l1, l2, l3 = data
+    await bot.send_message(
+        event.chat_id,
+        msg.raw_text,
+        file=media,
+        buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
+    )
+    
+
 @client.on(events.NewMessage(outgoing=True, pattern=("\+mkpost")))
 async def _(event):
     msg = await event.get_reply_message()
@@ -233,7 +250,7 @@ async def _(event):
         media = await client.download_media(msg.media)
     except:
         media = None
-        
+
     bot_username = event.raw_text.split(" ")[1].replace("@", "")
     channel_id = event.raw_text.split(" ")[2]
     if not channel_id.startswith("-100"):
