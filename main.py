@@ -225,22 +225,46 @@ async def _(event):
 @client.on(events.NewMessage(outgoing=True, pattern=("\+mkpost")))
 async def _(event):
     msg = await event.get_reply_message()
+    if msg == None:
+        await event.reply("+mkpost <bot_username> <database_id>")
+        return
+
+    bot_username = event.raw_text.split(" ")[1].replace("@", "")
+    channel_id = event.raw_text.split(" ")[2]
+    if not channel_id.startswith("-100"):
+        channel_id = f"-100{channel_id}"
+
+    id = msg.id
+    l1 = await client.get_messages(event.chat_id, ids=id)
+    l2 = await client.get_messages(event.chat_id, ids=id+1)
+    l3 = await client.get_messages(event.chat_id, ids=id+2)
+
+    m1 = await client.send_message(channel_id, l1)
+    m2 = await client.send_message(channel_id, l2)
+    m3 = await client.send_message(channel_id, l3)
     try:
         media = await client.download_media(msg.media)
     except:
         media = None
-    data = event.raw_text.split("\n")[1:]
-    l1, l2, l3 = data
+
+
     await bot.send_message(
         event.chat_id,
         msg.raw_text,
         file=media,
-        buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
+        buttons=[
+            Button.url("360p", f"t.me/{bot_username}?start=single_{channel_id}_{m1.id}client{event.sender_id}"), 
+            Button.url("720p", f"t.me/{bot_username}?start=single_{channel_id}_{m2.id}client{event.sender_id}"), 
+            Button.url("1080p", f"t.me/{bot_username}?start=single_{channel_id}_{m3.id}client{event.sender_id}")
+        ]
     )
     
 @client.on(events.NewMessage(outgoing=True, pattern=("\+bulkmkpost")))
 async def _(event):
     msg = await event.get_reply_message()
+    if msg == None:
+        await event.reply("bot_username|xyz\n\ndatabase_id|xyz\n\nstart|xyz\n\nend|xyz\n\ntarget|xyz\n\nstartep|xyz\n\nname|xyz")
+        return
     try:
         media = await client.download_media(msg.media)
     except:
@@ -253,6 +277,16 @@ async def _(event):
         d1 = i.split("|")
         fch[d1[0]] = d1[1]
 
+    database_id = fch['database_id']
+    if not database_id.startswith("-100"):
+        database_id = f"-100{database_id}"
+    database_id = int(database_id)
+    bot_username = fch['bot_username'].replace("@", "")
+    if not target.startswith("-100"):
+        target = f"-100{target}"
+    target = int(target)
+
+
     a = int(fch["startep"])
     txt = ""
     for i in range(int(fch["start"]),int(fch["end"])+1, 3):
@@ -260,14 +294,14 @@ async def _(event):
         l2 = await client.get_messages(event.chat_id, ids=i+1)
         l3 = await client.get_messages(event.chat_id, ids=i+2)
         
-        m1 = await client.send_message(-1001985589023, l1)
-        m2 = await client.send_message(-1001985589023, l2)
-        m3 = await client.send_message(-1001985589023, l3)
+        m1 = await client.send_message(database_id, l1)
+        m2 = await client.send_message(database_id, l2)
+        m3 = await client.send_message(database_id, l3)
 
         name = fch["name"]
-        l1080 = f"t.me/FileService_AnimeBot?start=single_{-1001985589023}_{m1.id}client{event.sender_id}"
-        l720 = f"t.me/FileService_AnimeBot?start=single_{-1001985589023}_{m2.id}client{event.sender_id}"
-        l360 = f"t.me/FileService_AnimeBot?start=single_{-1001985589023}_{m3.id}client{event.sender_id}"
+        l1080 = f"t.me/{bot_username}?start=single_{database_id}_{m1.id}client{event.sender_id}"
+        l720 = f"t.me/{bot_username}?start=single_{database_id}_{m2.id}client{event.sender_id}"
+        l360 = f"t.me/{bot_username}?start=single_{database_id}_{m3.id}client{event.sender_id}"
         
         if a<10:
             temp = name.replace("OwO", f"00{a}")
@@ -281,13 +315,86 @@ async def _(event):
             temp = name.replace("OwO", f"{a}")
 
         final = await bot.send_message(
-            int(fch["target"]),
+            target,
             temp,
             file=media,
             buttons=[Button.url("360p", l360), Button.url("720p", l720), Button.url("1080p", l1080)]
         )
         a += 1
-        txt += f"t.me/c/{fch['target'].replace('-100', '')}/{final.id}"
+        txt += f"t.me/c/{target.replace('-100', '')}/{final.id}"
+        txt += "\n"
+    await event.reply(txt)
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+subdubbulkpost")))
+async def _(event):
+    msg = await event.get_reply_message()
+    if msg == None:
+        await event.reply("bot_username|xyz\n\ndatabase_id|xzy\n\nsubstart|xyz\n\nsubend|xyz\n\ndubstart|xyz\n\ndubend|xyz\n\ntarget|xyz\n\nstartep|xyz\n\nname|xyz")
+        return
+    try:
+        media = await client.download_media(msg.media)
+    except:
+        media = None
+
+    data = msg.raw_text.split("\n\n")
+    fch = dict()
+
+    for i in data:
+        d1 = i.split("|")
+        fch[d1[0]] = d1[1]
+
+    database_id = fch['database_id']
+    if not database_id.startswith("-100"):
+        database_id = f"-100{database_id}"
+    database_id = int(database_id)
+    bot_username = fch['bot_username'].replace("@", "")
+    target = fch['target']
+    if not target.startswith("-100"):
+        target = f"-100{target}"
+    target = int(target)
+
+    a = int(fch["startep"])
+    txt = ""
+    for i in range(int(fch["substart"]),int(fch["subend"])+1, 3):
+        #sub
+        l1, l2, l3 = await client.get_messages(event.chat_id, ids=[i, i+1, i+2])
+        
+        m1 = await client.send_message(database_id, l1)
+        m2 = await client.send_message(database_id, l2)
+        m3 = await client.send_message(database_id, l3)
+
+        #dub
+        d_id = i + int(fch["dubstart"]) - int(fch["substart"])
+        l4, l5, l6 = await client.get_messages(event.chat_id, ids=[d_id, d_id+1, d_id+2])
+
+        m4 = await client.send_message(database_id, l4)
+        m5 = await client.send_message(database_id, l5)
+        m6 = await client.send_message(database_id, l6)
+
+        lsub = f"t.me/{bot_username}?start=batch_{m1.id}_{m3.id}"
+        ldub = f"t.me/{bot_username}?start=batch_{m4.id}_{m6.id}"
+        
+        name = fch["name"]
+
+        if a<10:
+            temp = name.replace("OwO", f"00{a}")
+            temp = temp.replace("UwU", f"0{a}")
+
+        elif a<100:
+            temp = name.replace("OwO", f"0{a}")
+            temp = temp.replace("UwU", f"{a}")
+
+        else:
+            temp = name.replace("OwO", f"{a}")
+
+        final = await bot.send_message(
+            target,
+            temp,
+            file=media,
+            buttons=[Button.url("Sub", lsub), Button.url("Dub", ldub)]
+        )
+        a += 1
+        txt += f"t.me/c/{str(target).replace('-100', '')}/{final.id}"
         txt += "\n"
     await event.reply(txt)
 
