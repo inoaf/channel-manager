@@ -233,6 +233,7 @@ async def _(event):
     channel_id = event.raw_text.split(" ")[2]
     if not channel_id.startswith("-100"):
         channel_id = f"-100{channel_id}"
+    channel_id = int(channel_id)
 
     id = msg.id
     l1 = await client.get_messages(event.chat_id, ids=id)
