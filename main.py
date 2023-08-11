@@ -229,6 +229,11 @@ async def _(event):
         await event.reply("+mkpost <bot_username> <database_id>")
         return
 
+    try:
+        media = await client.download_media(msg.media)
+    except:
+        media = None
+        
     bot_username = event.raw_text.split(" ")[1].replace("@", "")
     channel_id = event.raw_text.split(" ")[2]
     if not channel_id.startswith("-100"):
@@ -236,17 +241,13 @@ async def _(event):
     channel_id = int(channel_id)
 
     id = msg.id
-    l1 = await client.get_messages(event.chat_id, ids=id)
-    l2 = await client.get_messages(event.chat_id, ids=id+1)
-    l3 = await client.get_messages(event.chat_id, ids=id+2)
+    l1 = await client.get_messages(event.chat_id, ids=id+1)
+    l2 = await client.get_messages(event.chat_id, ids=id+2)
+    l3 = await client.get_messages(event.chat_id, ids=id+3)
 
     m1 = await client.send_message(channel_id, l1)
     m2 = await client.send_message(channel_id, l2)
     m3 = await client.send_message(channel_id, l3)
-    try:
-        media = await client.download_media(msg.media)
-    except:
-        media = None
 
 
     await bot.send_message(
@@ -254,9 +255,9 @@ async def _(event):
         msg.raw_text,
         file=media,
         buttons=[
-            Button.url("360p", f"t.me/{bot_username}?start=single_{channel_id}_{m1.id}client{event.sender_id}"), 
+            Button.url("1080p", f"t.me/{bot_username}?start=single_{channel_id}_{m1.id}client{event.sender_id}"), 
             Button.url("720p", f"t.me/{bot_username}?start=single_{channel_id}_{m2.id}client{event.sender_id}"), 
-            Button.url("1080p", f"t.me/{bot_username}?start=single_{channel_id}_{m3.id}client{event.sender_id}")
+            Button.url("360p", f"t.me/{bot_username}?start=single_{channel_id}_{m3.id}client{event.sender_id}")
         ]
     )
     
