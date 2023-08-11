@@ -341,7 +341,7 @@ async def _(event):
             buttons=[Button.url("360p", l360), Button.url("720p", l720), Button.url("1080p", l1080)]
         )
         a += 1
-        txt += f"t.me/c/{target.replace('-100', '')}/{final.id}"
+        txt += f"t.me/c/{str(target).replace('-100', '')}/{final.id}"
         txt += "\n"
     await event.reply(txt)
 
