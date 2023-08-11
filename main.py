@@ -301,6 +301,7 @@ async def _(event):
         database_id = f"-100{database_id}"
     database_id = int(database_id)
     bot_username = fch['bot_username'].replace("@", "")
+    target = fch['target']
     if not target.startswith("-100"):
         target = f"-100{target}"
     target = int(target)
