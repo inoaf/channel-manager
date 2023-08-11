@@ -272,9 +272,9 @@ async def _(event):
         msg.raw_text,
         file=media,
         buttons=[
-            Button.url("1080p", f"t.me/{bot_username}?start=single_{channel_id}_{m1.id}client{event.sender_id}"), 
+            Button.url("360p", f"t.me/{bot_username}?start=single_{channel_id}_{m3.id}client{event.sender_id}"),
             Button.url("720p", f"t.me/{bot_username}?start=single_{channel_id}_{m2.id}client{event.sender_id}"), 
-            Button.url("360p", f"t.me/{bot_username}?start=single_{channel_id}_{m3.id}client{event.sender_id}")
+            Button.url("1080p", f"t.me/{bot_username}?start=single_{channel_id}_{m1.id}client{event.sender_id}") 
         ]
     )
     
