@@ -237,7 +237,6 @@ async def _(event):
         file=media,
         buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
     )
-    
 
 @client.on(events.NewMessage(outgoing=True, pattern=("\+mkpost")))
 async def _(event):
@@ -417,6 +416,87 @@ async def _(event):
         txt += f"t.me/c/{str(target).replace('-100', '')}/{final.id}"
         txt += "\n"
     await event.reply(txt)
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+check")))
+async def _(event):
+    def extract_episode_resolution(filename):
+        parts = filename.split(" ")
+        episode = None
+        resolution = None
+        for part in parts:
+            if part.isdigit():
+                episode = int(part)
+            elif part.endswith("p.mkv"):
+                resolution = part[:-5]
+        return episode, resolution
+    await event.reply("On it")
+    data = event.raw_text.split("\n")
+    channel_id = int(f"-100{data[1].split('/')[-2]}")
+    start_link = int(data[1].split("/")[-1])
+    end_link = int(data[2].split("/")[-1])
+    ids = [i for i in range(start_link, end_link + 1)]
+    x = await client.get_messages(channel_id, ids=ids)
+    files = []
+    
+    msgs = dict()
+    for i in x:
+        try:
+            files.append(f"{i.id}:{i.media.document.attributes[0].file_name}")
+            msgs[i.id] = i
+        except:
+            pass
+    start_ep = extract_episode_resolution(files[0])[0]
+    end_ep = extract_episode_resolution(files[-1])[0]
+    episodes = {ep: {"1080", "720", "360"} for ep in range(start_ep, end_ep + 1)}
+
+    for filename in files:
+        episode, resolution = extract_episode_resolution(filename)
+        if episode is not None and resolution is not None and episode in episodes:
+            episodes[episode].discard(resolution)
+
+    missing_episodes = [(ep, missing_resolutions) for ep, missing_resolutions in episodes.items() if missing_resolutions]
+    txt = "Missing Episodes:\n"
+    for i in missing_episodes:
+        txt += f"{i[0]}: {','.join(i[1])}\n"
+    await event.reply(txt)
+    if "sort" in event.raw_text:
+        files.sort(key=lambda filename: (extract_episode_resolution(filename)[0], ["1080", "720", "360"].index(extract_episode_resolution(filename)[1])))
+        for i in files:
+            id = int(i.split(":")[0])
+            await client.send_message(event.chat_id, msgs[id])
+            time.sleep(0.25)
+
+@client.on(events.NewMessage(outgoing=True, pattern=("\+linkedit")))
+async def _(event):
+    msg = await event.get_reply_message()
+    if msg == None:
+        await event.reply("channel_id|-100xyz\n\nmsglink|xyz\n\nnewlink360|xyz\n\nnewlink720|xyz\n\nnewlink1080|xyz")
+        return
+    else:
+        data = msg.raw_text.split("\n\n")
+        d = dict() 
+        for i in data:
+            d1 = i.split("|")
+            d[d1[0]] = d1[1]
+    channel_id = int(d["channel_id"])
+    msg_id = int(d["msglink"].split("/")[-1])
+    x = await bot.get_messages(channel_id, ids=msg_id)
+    await x.edit(buttons=[Button.url("360p", d["newlink360"]), Button.url("720p", d["newlink720"]), Button.url("1080p", d["newlink1080"])])
+    await event.edit("done")
+
+# @client.on(events.NewMessage(outgoing=True, pattern=("\+swapusername")))
+# async def _(event):
+#     msg = await event.get_reply_message()
+#     if msg == None:
+#         await event.reply("channel_id|-100xyz\n\nstart_link|xyz\n\nend_link|xyz\n\nnew_bot_username|@xyz")
+#         return
+#     else:
+#         data = msg.raw_text.split("\n\n")
+#         d = dict() 
+#         for i in data:
+#             d1 = i.split("|")
+#             d[d1[0]] = d1[1]
+
 
 client.start()
 
