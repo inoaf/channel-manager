@@ -1,6 +1,6 @@
 import time
 from telethon import events, Button
-from config import client, bot, main_bot_id
+from config import client, bot, main_bot_id, approved_users
 import os
 from telethon.tl.functions.channels import JoinChannelRequest
 from petpetgif import petpet
@@ -26,18 +26,18 @@ Commands avilabe:-
 *Note if channel/group you are working with is private in place of username put invite link starting from `joinchat/.....`
 """
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+help")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+help")))
 async def help_function(event):
-    await event.edit(help_text)
+    await event.reply(help_text)
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+ping")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+ping")))
 async def hi_function(event):
-    await event.edit("pong")
+    await event.reply("pong")
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+fwd")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+fwd")))
 async def fwd_function(event):
     try:
-        await event.edit("okay, on it")
+        await event.reply("okay, on it")
         split = event.raw_text.split(":")
         username_of_channel = split[1]
         start_id = int(split[2])
@@ -58,7 +58,7 @@ async def fwd_function(event):
     await x.delete()
     await event.delete()
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+edit")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+edit")))
 async def edit_function(event):
     split = event.raw_text.split(":")
     username = split[1]
@@ -66,11 +66,11 @@ async def edit_function(event):
     reply = await event.get_reply_message()
     entity = await client.get_entity(f"t.me/{username}")
     message = await client.get_messages(entity, ids=msg_id)
-    await event.edit("Editing the message holup....")
+    await event.reply("Editing the message holup....")
     await client.edit_message(reply, file=message.media, force_document=True)
     await event.delete()
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+purge")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+purge")))
 async def purge(event):
     split = event.raw_text.split(":")
     start = int(split[1])
@@ -84,7 +84,7 @@ async def purge(event):
         time.sleep(0.25)
     await event.delete()
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+sort")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+sort")))
 async def sort(event):
     split = event.raw_text.split(":")
     files = []
@@ -101,12 +101,12 @@ async def sort(event):
         await client.send_message(event.chat_id, x)
         time.sleep(0.25)
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+msgid")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+msgid")))
 async def msg_id(event):
     reply = await event.get_reply_message()
-    await event.edit(f"`{reply.id}`") 
+    await event.reply(f"`{reply.id}`") 
     
-@client.on(events.NewMessage(outgoing=True, pattern=("\+pet")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+pet")))
 async def pet(event):
     reply = await event.get_reply_message()
     await event.delete()
@@ -114,46 +114,46 @@ async def pet(event):
     petpet.make(pic, "res.gif")
     await reply.reply(file="res.gif")
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+copy")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+copy")))
 async def copy_message(event):
     try:
         global msg
-        await event.edit("okay, on it")
+        await event.reply("okay, on it")
         msg = await event.get_reply_message()
-        await event.edit("Done.")
+        await event.reply("Done.")
     except Exception as e:
-        await event.edit(str(e))
+        await event.reply(str(e))
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+linkp")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+linkp")))
 async def _(event):
     global link_preview
     link_preview = False if link_preview == True else True
-    await event.edit(f"Link preview set to: {link_preview}")
+    await event.reply(f"Link preview set to: {link_preview}")
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+show")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+show")))
 async def preveiw(event):
     try:
         global msg
-        await event.edit("okay, on it")
+        await event.reply("okay, on it")
         if msg is not None:
             media = await client.download_media(msg.media)
             await bot.send_message(event.chat_id,message=msg.text,buttons=msg.buttons,file=media,link_preview=link_preview)
             await event.delete()
             os.remove(media)
         else:
-            await event.edit("No message copied")
+            await event.reply("No message copied")
     except Exception as e:
-        await event.edit(str(e))
+        await event.reply(str(e))
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+post")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+post")))
 async def post(event):
     try:
         global msg
-        await event.edit("okay, on it")
+        await event.reply("okay, on it")
         if msg is not None:
             reply = await event.get_reply_message()
             if reply is None:
-                await event.edit("reply to a message")
+                await event.reply("reply to a message")
                 return
             ids = reply.text.replace("@","t.me/")
             ids = ids.split("\n")
@@ -163,23 +163,23 @@ async def post(event):
                 ent = await bot.get_entity(i)
                 a = await bot.send_message(ent,message=msg.text,buttons=msg.buttons,file=media,link_preview=link_preview)
                 ads.append(i + "/" + str(a.id))
-            await event.edit("\n".join(ads))
+            await event.reply("\n".join(ads))
             try:
                 os.remove(media)
             except:
                 pass
         else:
-            await event.edit("No message copied")
+            await event.reply("No message copied")
     except Exception as e:
-        await event.edit(str(e))
+        await event.reply(str(e))
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+del")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+del")))
 async def delete(event):
     try:
-        await event.edit("okay, on it")
+        await event.reply("okay, on it")
         x = await event.get_reply_message()
         if x is None:
-            event.edit("reply to message")
+            event.reply("reply to message")
             return
         txt = x.text.split('\n')
         for i in txt:
@@ -189,17 +189,17 @@ async def delete(event):
             print(username)
             await bot.delete_messages("t.me/"+username, msgid)
 
-        await event.edit("Done.")
+        await event.reply("Done.")
     except Exception as e:
-        await event.edit(str(e))
+        await event.reply(str(e))
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+parse")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+parse")))
 async def parse(event):
     try:
-        await event.edit("okay, on it")
+        await event.reply("okay, on it")
         x = await event.get_reply_message()
         if x is None:
-            event.edit("reply to message")
+            event.reply("reply to message")
             return
         msg = []
         x = x.text.split("\n")
@@ -207,11 +207,11 @@ async def parse(event):
             a = i.split()
             msg.append(a[0])
 
-        await event.edit("\n".join(msg))
+        await event.reply("\n".join(msg))
     except Exception as e:
-        await event.edit(str(e))
+        await event.reply(str(e))
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+promote")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+promote")))
 async def _(event):
     data = event.raw_text.split(" ")
     user = event.sender_id
@@ -220,9 +220,9 @@ async def _(event):
     perms = await bot.get_permissions(chat, me)
     await client(JoinChannelRequest(data[1]))
     await bot.edit_admin(chat, user, change_info=perms.change_info, post_messages= perms.post_messages, edit_messages=perms.edit_messages, delete_messages=perms.delete_messages, invite_users=perms.invite_users, add_admins=perms.add_admins, manage_call=perms.manage_call)
-    await event.edit(f"Promoted in {data[1]}")
+    await event.reply(f"Promoted in {data[1]}")
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+oldmkpost")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+oldmkpost")))
 async def _(event):
     msg = await event.get_reply_message()
     try:
@@ -238,7 +238,7 @@ async def _(event):
         buttons=[Button.url("360p", l1), Button.url("720p", l2), Button.url("1080p", l3)]
     )
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+mkpost")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+mkpost")))
 async def _(event):
     msg = await event.get_reply_message()
     if msg == None:
@@ -277,7 +277,7 @@ async def _(event):
         ]
     )
     
-@client.on(events.NewMessage(outgoing=True, pattern=("\+bulkmkpost")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+bulkmkpost")))
 async def _(event):
     msg = await event.get_reply_message()
     if msg == None:
@@ -344,7 +344,7 @@ async def _(event):
         txt += "\n"
     await event.reply(txt)
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+subdubbulkpost")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+subdubbulkpost")))
 async def _(event):
     msg = await event.get_reply_message()
     if msg == None:
@@ -417,7 +417,7 @@ async def _(event):
         txt += "\n"
     await event.reply(txt)
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+check")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+check")))
 async def _(event):
     def extract_episode_resolution(filename):
         parts = filename.split(" ")
@@ -466,7 +466,7 @@ async def _(event):
             await client.send_message(event.chat_id, msgs[id])
             time.sleep(0.25)
 
-@client.on(events.NewMessage(outgoing=True, pattern=("\+linkedit")))
+@client.on(events.NewMessage(from_users=approved_users, pattern=("\+linkedit")))
 async def _(event):
     msg = await event.get_reply_message()
     if msg == None:
@@ -482,9 +482,9 @@ async def _(event):
     msg_id = int(d["msglink"].split("/")[-1])
     x = await bot.get_messages(channel_id, ids=msg_id)
     await x.edit(buttons=[Button.url("360p", d["newlink360"]), Button.url("720p", d["newlink720"]), Button.url("1080p", d["newlink1080"])])
-    await event.edit("done")
+    await event.reply("done")
 
-# @client.on(events.NewMessage(outgoing=True, pattern=("\+swapusername")))
+# @client.on(events.NewMessage(from_users=approved_users, pattern=("\+swapusername")))
 # async def _(event):
 #     msg = await event.get_reply_message()
 #     if msg == None:
