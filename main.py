@@ -271,9 +271,9 @@ async def _(event):
         msg.raw_text,
         file=media,
         buttons=[
-            Button.url("360p", f"t.me/{bot_username}?start=single_{channel_id}_{m3.id}client{event.sender_id}"),
-            Button.url("720p", f"t.me/{bot_username}?start=single_{channel_id}_{m2.id}client{event.sender_id}"), 
-            Button.url("1080p", f"t.me/{bot_username}?start=single_{channel_id}_{m1.id}client{event.sender_id}") 
+            Button.url("360p", f"t.me/{bot_username}?start=single_{channel_id}_{m3.id}"),
+            Button.url("720p", f"t.me/{bot_username}?start=single_{channel_id}_{m2.id}"), 
+            Button.url("1080p", f"t.me/{bot_username}?start=single_{channel_id}_{m1.id}") 
         ]
     )
     
@@ -318,9 +318,9 @@ async def _(event):
         m3 = await client.send_message(database_id, l3)
 
         name = fch["name"]
-        l1080 = f"t.me/{bot_username}?start=single_{database_id}_{m1.id}client{event.sender_id}"
-        l720 = f"t.me/{bot_username}?start=single_{database_id}_{m2.id}client{event.sender_id}"
-        l360 = f"t.me/{bot_username}?start=single_{database_id}_{m3.id}client{event.sender_id}"
+        l1080 = f"t.me/{bot_username}?start=single_{database_id}_{m1.id}"
+        l720 = f"t.me/{bot_username}?start=single_{database_id}_{m2.id}"
+        l360 = f"t.me/{bot_username}?start=single_{database_id}_{m3.id}"
         
         if a<10:
             temp = name.replace("OwO", f"00{a}")
