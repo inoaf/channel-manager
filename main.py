@@ -2,7 +2,6 @@ import time
 from telethon import events, Button
 from config import client, bot, main_bot_id, approved_users
 import os
-from telethon.tl.functions.channels import JoinChannelRequest
 from petpetgif import petpet
 
 msg = None
@@ -218,7 +217,6 @@ async def _(event):
     me = await bot.get_entity(main_bot_id)
     chat = await bot.get_entity(data[1])
     perms = await bot.get_permissions(chat, me)
-    await client(JoinChannelRequest(data[1]))
     await bot.edit_admin(chat, user, change_info=perms.change_info, post_messages= perms.post_messages, edit_messages=perms.edit_messages, delete_messages=perms.delete_messages, invite_users=perms.invite_users, add_admins=perms.add_admins, manage_call=perms.manage_call)
     await event.reply(f"Promoted in {data[1]}")
 
