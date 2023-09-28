@@ -426,6 +426,8 @@ async def _(event):
                 episode = int(part)
             elif part.endswith("p.mkv"):
                 resolution = part[:-5]
+            elif part.endswith("p"):
+                resolution = part[:-1]
         return episode, resolution
     await event.reply("On it")
     data = event.raw_text.split("\n")
