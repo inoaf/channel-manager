@@ -306,7 +306,7 @@ async def _(event):
 
     a = int(fch["startep"])
     txt = ""
-    for i in range(int(fch["start"]),int(fch["end"])+1, 3):
+    for i in range(int(fch["start"].split("/")[-1]),int(fch["end"].split("/")[-1])+1, 3):
         l1 = await client.get_messages(event.chat_id, ids=i)
         l2 = await client.get_messages(event.chat_id, ids=i+1)
         l3 = await client.get_messages(event.chat_id, ids=i+2)
@@ -372,7 +372,7 @@ async def _(event):
 
     a = int(fch["startep"])
     txt = ""
-    for i in range(int(fch["substart"]),int(fch["subend"])+1, 3):
+    for i in range(int(fch["substart"].split("/")[-1]),int(fch["subend"].split("/")[-1])+1, 3):
         #sub
         l1, l2, l3 = await client.get_messages(event.chat_id, ids=[i, i+1, i+2])
         
@@ -381,7 +381,7 @@ async def _(event):
         m3 = await client.send_message(database_id, l3)
 
         #dub
-        d_id = i + int(fch["dubstart"]) - int(fch["substart"])
+        d_id = i + int(fch["dubstart"].split("/")[-1]) - int(fch["substart"].split("/")[-1])
         l4, l5, l6 = await client.get_messages(event.chat_id, ids=[d_id, d_id+1, d_id+2])
 
         m4 = await client.send_message(database_id, l4)
@@ -439,7 +439,10 @@ async def _(event):
     msgs = dict()
     for i in x:
         try:
-            files.append(f"{i.id}:{i.media.document.attributes[0].file_name}")
+            if "caption" in event.raw_text:
+                files.append(f"{i.raw_text}")
+            else:
+                files.append(f"{i.id}:{i.media.document.attributes[0].file_name}")
             msgs[i.id] = i
         except:
             pass
