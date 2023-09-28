@@ -440,7 +440,7 @@ async def _(event):
     for i in x:
         try:
             if "caption" in event.raw_text:
-                files.append(f"{i.raw_text}")
+                files.append(f"{i.id}:{i.raw_text}")
             else:
                 files.append(f"{i.id}:{i.media.document.attributes[0].file_name}")
             msgs[i.id] = i
