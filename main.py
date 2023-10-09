@@ -279,7 +279,8 @@ async def _(event):
 async def _(event):
     msg = await event.get_reply_message()
     if msg == None:
-        await event.reply("bot_username|xyz\n\ndatabase_id|xyz\n\nstart|xyz\n\nend|xyz\n\ntarget|xyz\n\nstartep|xyz\n\nname|xyz")
+        await event.reply("bot_username|xyz\n\ndatabase_id|xyz\n\nstart|xyz\n\nend|xyz\n\ntarget|xyz\n\nstartep|xyz\n\nname|xyz\n\nbuttonrows,cols|x,y\n\nbuttontxt|x1,y1,z1,x2,y2,z2")
+        await event.reply("Mention button rows and colunms, button text needs to be given row wise, with comma seperation")
         return
     try:
         media = await client.download_media(msg.media)
@@ -303,23 +304,21 @@ async def _(event):
         target = f"-100{target}"
     target = int(target)
 
+    rows, cols = list(map(int, fch["buttonraws,cols"].split(",")))
+    buttoncount = rows * cols
+    buttontxt = list(map(lambda x: x.strip(), fch["buttontxt"].split(",")))
+
 
     a = int(fch["startep"])
     txt = ""
-    for i in range(int(fch["start"].split("/")[-1]),int(fch["end"].split("/")[-1])+1, 3):
-        l1 = await client.get_messages(event.chat_id, ids=i)
-        l2 = await client.get_messages(event.chat_id, ids=i+1)
-        l3 = await client.get_messages(event.chat_id, ids=i+2)
+    for i in range(int(fch["start"].split("/")[-1]),int(fch["end"].split("/")[-1])+1, buttoncount):
+        links = []
+        for j in range(buttoncount):
+            li = await client.get_messages(event.chat_id, ids=i+j)
+            mi = await client.send_message(database_id, li)
+            links.append(f"t.me/{bot_username}?start=single_{database_id}_{mi.id}")
         
-        m1 = await client.send_message(database_id, l1)
-        m2 = await client.send_message(database_id, l2)
-        m3 = await client.send_message(database_id, l3)
-
         name = fch["name"]
-        l1080 = f"t.me/{bot_username}?start=single_{database_id}_{m1.id}"
-        l720 = f"t.me/{bot_username}?start=single_{database_id}_{m2.id}"
-        l360 = f"t.me/{bot_username}?start=single_{database_id}_{m3.id}"
-        
         if a<10:
             temp = name.replace("OwO", f"00{a}")
             temp = temp.replace("UwU", f"0{a}")
@@ -331,11 +330,20 @@ async def _(event):
         else:
             temp = name.replace("OwO", f"{a}")
 
+        buttons = []
+        count = cols
+        for j in range(buttoncount):
+            if count == cols:
+                buttons.append([])
+                count = 0 
+            buttons[-1].append(Button.url(buttontxt[j], links[j]))
+            count += 1
+
         final = await bot.send_message(
             target,
             temp,
             file=media,
-            buttons=[Button.url("360p", l360), Button.url("720p", l720), Button.url("1080p", l1080)]
+            buttons=buttons
         )
         a += 1
         txt += f"t.me/c/{str(target).replace('-100', '')}/{final.id}"
