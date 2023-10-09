@@ -339,7 +339,6 @@ async def _(event):
             buttons[-1].append(Button.url(buttontxt[j], links[j]))
             count += 1
 
-        await event.reply(links[0])
         final = await bot.send_message(
             target,
             temp,
