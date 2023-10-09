@@ -304,7 +304,7 @@ async def _(event):
         target = f"-100{target}"
     target = int(target)
 
-    rows, cols = list(map(int, fch["buttonraws,cols"].split(",")))
+    rows, cols = list(map(int, fch["buttonrows,cols"].split(",")))
     buttoncount = rows * cols
     buttontxt = list(map(lambda x: x.strip(), fch["buttontxt"].split(",")))
 
@@ -337,6 +337,7 @@ async def _(event):
                 buttons.append([])
                 count = 0 
             buttons[-1].append(Button.url(buttontxt[j], links[j]))
+            print(links[j])
             count += 1
 
         final = await bot.send_message(
