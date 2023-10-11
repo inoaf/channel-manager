@@ -436,9 +436,15 @@ async def _(event):
                 resolution = part[:-5]
             elif part.endswith("p"):
                 resolution = part[:-1]
+            elif part.lower() in ("hdrip", "hdrip.mkv"):
+                resolution = "4000"
         return episode, resolution
     await event.reply("On it")
     data = event.raw_text.split("\n")
+    if "HD" in event.raw_text:
+        epreses = ("360", "720", "1080", "4000")
+    else:
+        epreses = ("360", "720", "1080")
     channel_id = int(f"-100{data[1].split('/')[-2]}")
     start_link = int(data[1].split("/")[-1])
     end_link = int(data[2].split("/")[-1])
@@ -458,7 +464,7 @@ async def _(event):
             pass
     start_ep = extract_episode_resolution(files[0])[0]
     end_ep = extract_episode_resolution(files[-1])[0]
-    episodes = {ep: {"1080", "720", "360"} for ep in range(start_ep, end_ep + 1)}
+    episodes = {ep: set(epreses) for ep in range(start_ep, end_ep + 1)}
 
     for filename in files:
         episode, resolution = extract_episode_resolution(filename)
@@ -471,7 +477,7 @@ async def _(event):
         txt += f"{i[0]}: {','.join(i[1])}\n"
     await event.reply(txt)
     if "sort" in event.raw_text:
-        files.sort(key=lambda filename: (extract_episode_resolution(filename)[0], ["1080", "720", "360"].index(extract_episode_resolution(filename)[1])))
+        files.sort(key=lambda filename: (extract_episode_resolution(filename)[0], epreses.index(extract_episode_resolution(filename)[1])))
         for i in files:
             id = int(i.split(":")[0])
             await client.send_message(event.chat_id, msgs[id])
