@@ -432,12 +432,12 @@ async def _(event):
         for part in parts:
             if part.isdigit():
                 episode = int(part)
+            elif part.lower() in ("hdrip", "hdrip.mkv"):
+                resolution = "4000"
             elif part.endswith("p.mkv"):
                 resolution = part[:-5]
             elif part.endswith("p"):
                 resolution = part[:-1]
-            elif part.lower() in ("hdrip", "hdrip.mkv"):
-                resolution = "4000"
         return episode, resolution
     await event.reply("On it")
     data = event.raw_text.split("\n")
